@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData};
+use std::marker::PhantomData;
 
 use thiserror::Error;
 
@@ -186,7 +186,7 @@ pub(crate) fn find_path<'a, CS: CoordinateSystem>(
   archipelago: &'a Archipelago<CS>,
   start_point: &SampledPoint<'a, CS>,
   end_point: &SampledPoint<'a, CS>,
-  override_type_index_costs: &HashMap<usize, f32>,
+  override_type_index_costs: &std::collections::HashMap<usize, f32>,
   permitted_animation_links: PermittedAnimationLinks,
 ) -> Result<Vec<PathStep<CS>>, FindPathError> {
   // This assert can actually be triggered. This can happen if a user samples

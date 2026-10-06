@@ -1,4 +1,5 @@
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use crate::fixed_hash::{HashMap, HashSet};
+use std::collections::BinaryHeap;
 
 use dodgy_2d::VisibilitySet;
 use glam::{Vec3, Vec3Swizzles};
@@ -28,7 +29,7 @@ pub(crate) fn apply_avoidance_to_agents<CS: CoordinateSystem>(
     delta_time = 1.0;
   }
 
-  let mut agent_id_to_dodgy_agent = HashMap::new();
+  let mut agent_id_to_dodgy_agent = HashMap::default();
   let mut agent_kdtree = KdTree::new(/* dimensions= */ 3);
   let mut agent_max_radius = 0.0f32;
 
@@ -194,7 +195,7 @@ fn nav_mesh_borders_to_dodgy_obstacles<CS: CoordinateSystem>(
   let distance_limit = distance_limit * distance_limit;
 
   let mut visibility_set = VisibilitySet::new();
-  let mut border_edges = HashMap::new();
+  let mut border_edges = HashMap::default();
   let mut new_vertices = Vec::new();
 
   struct ExploreNode {
@@ -221,7 +222,7 @@ fn nav_mesh_borders_to_dodgy_obstacles<CS: CoordinateSystem>(
     }
   }
 
-  let mut explored_nodes = HashSet::new();
+  let mut explored_nodes = HashSet::default();
   let mut next_nodes = BinaryHeap::new();
   next_nodes.push(ExploreNode { node: agent_node.1, score: 0.0 });
 

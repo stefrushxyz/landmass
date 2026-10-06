@@ -1,4 +1,5 @@
-use std::{cmp::Ordering, collections::HashSet};
+use crate::fixed_hash::HashSet;
+use std::cmp::Ordering;
 
 use glam::{Vec3, Vec3Swizzles};
 

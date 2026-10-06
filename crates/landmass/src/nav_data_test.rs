@@ -1,9 +1,4 @@
-use std::{
-  cmp::Ordering,
-  collections::{HashMap, HashSet},
-  f32::consts::PI,
-  sync::Arc,
-};
+use std::{cmp::Ordering, f32::consts::PI, sync::Arc};
 
 use glam::{Vec2, Vec3};
 use googletest::{
@@ -12,6 +7,7 @@ use googletest::{
 };
 use slotmap::{DenseSlotMap, SlotMap};
 
+use crate::fixed_hash::{HashMap, HashSet};
 use crate::{
   Archipelago, ArchipelagoOptions, CoordinateSystem, FromAgentRadius,
   HeightNavigationMesh, HeightPolygon, IslandId, PermittedAnimationLinks,
@@ -254,8 +250,8 @@ fn link_edges_between_islands_links_touching_islands() {
   let island_2_edge_bbh = island_edges_bbh(&island_2);
 
   let mut boundary_links = SlotMap::with_key();
-  let mut node_to_boundary_link_ids = HashMap::new();
-  let mut modified_node_refs_to_update = HashSet::new();
+  let mut node_to_boundary_link_ids = HashMap::default();
+  let mut modified_node_refs_to_update = HashSet::default();
 
   link_edges_between_islands(
     (island_1_id, &island_1),
@@ -480,8 +476,8 @@ fn link_edges_between_islands_links_touching_islands() {
   );
 
   boundary_links = SlotMap::with_key();
-  node_to_boundary_link_ids = HashMap::new();
-  modified_node_refs_to_update = HashSet::new();
+  node_to_boundary_link_ids = HashMap::default();
+  modified_node_refs_to_update = HashSet::default();
 
   link_edges_between_islands(
     (island_2_id, &island_2),
@@ -866,7 +862,11 @@ fn modifies_node_boundaries_for_linked_islands() {
   assert_eq!(
     clone_sort_round_modified_nodes(
       &nav_data.modified_nodes,
-      &HashMap::from([(island_1_id, 6), (island_2_id, 6), (island_3_id, 6)]),
+      &HashMap::from_iter([
+        (island_1_id, 6),
+        (island_2_id, 6),
+        (island_3_id, 6)
+      ]),
       &[island_1_id, island_2_id, island_3_id],
       1e-4
     ),
@@ -1229,18 +1229,24 @@ fn permitted_animation_link_blocks_region_connectivity() {
   expect_true!(nav_data.are_nodes_connected(
     NodeRef { island_id: island_1, polygon_index: 0 },
     NodeRef { island_id: island_2, polygon_index: 0 },
-    PermittedAnimationLinks::Kinds(Arc::new(HashSet::from([0]))),
+    PermittedAnimationLinks::Kinds(Arc::new(std::collections::HashSet::from(
+      [0]
+    ))),
   ));
   expect_true!(nav_data.are_nodes_connected(
     NodeRef { island_id: island_1, polygon_index: 0 },
     NodeRef { island_id: island_2, polygon_index: 0 },
-    PermittedAnimationLinks::Kinds(Arc::new(HashSet::from([1]))),
+    PermittedAnimationLinks::Kinds(Arc::new(std::collections::HashSet::from(
+      [1]
+    ))),
   ));
   // Using neither link cases the nodes to be unconnected.
   expect_false!(nav_data.are_nodes_connected(
     NodeRef { island_id: island_1, polygon_index: 0 },
     NodeRef { island_id: island_2, polygon_index: 0 },
-    PermittedAnimationLinks::Kinds(Arc::new(HashSet::from([2]))),
+    PermittedAnimationLinks::Kinds(Arc::new(std::collections::HashSet::from(
+      [2]
+    ))),
   ));
 }
 

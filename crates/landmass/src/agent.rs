@@ -1,7 +1,5 @@
-use std::{
-  collections::{HashMap, HashSet},
-  sync::Arc,
-};
+use crate::fixed_hash::HashSet;
+use std::sync::Arc;
 
 use glam::Vec3;
 use slotmap::new_key_type;
@@ -89,7 +87,7 @@ pub struct Agent<CS: CoordinateSystem> {
   /// This can later be used for visualization.
   pub keep_avoidance_data: bool,
   /// Overrides for the "default" costs of each type index.
-  pub(crate) override_type_index_to_cost: HashMap<usize, f32>,
+  pub(crate) override_type_index_to_cost: std::collections::HashMap<usize, f32>,
   /// The current path of the agent. None if a path is unavailable or a new
   /// path has not been computed yet (i.e., no path).
   pub(crate) current_path: Option<Path>,
@@ -172,7 +170,7 @@ pub enum PermittedAnimationLinks {
   #[default]
   All,
   /// Only animation links whose kind is in this set are permitted.
-  Kinds(Arc<HashSet<usize>>),
+  Kinds(Arc<std::collections::HashSet<usize>>),
 }
 
 impl PermittedAnimationLinks {
@@ -208,7 +206,7 @@ impl<CS: CoordinateSystem> Agent<CS> {
       paused: false,
       #[cfg(feature = "debug-avoidance")]
       keep_avoidance_data: false,
-      override_type_index_to_cost: HashMap::new(),
+      override_type_index_to_cost: std::collections::HashMap::new(),
       current_path: None,
       current_desired_move: CS::from_landmass(&Vec3::ZERO),
       state: AgentState::Idle,

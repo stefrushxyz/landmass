@@ -1,4 +1,6 @@
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
+
+use crate::fixed_hash::HashMap;
 
 use glam::{Vec2, Vec3};
 use slotmap::DenseSlotMap;
@@ -443,7 +445,7 @@ fn applies_no_avoidance_for_far_agents() {
     agent
   });
 
-  let mut agent_id_to_agent_node = HashMap::new();
+  let mut agent_id_to_agent_node = HashMap::default();
   agent_id_to_agent_node.insert(
     agent_1,
     (
@@ -464,7 +466,7 @@ fn applies_no_avoidance_for_far_agents() {
     &mut agents,
     &agent_id_to_agent_node,
     /* characters= */ &DenseSlotMap::with_key(),
-    /* character_id_to_nav_mesh_point= */ &HashMap::new(),
+    /* character_id_to_nav_mesh_point= */ &HashMap::default(),
     &nav_data,
     &ArchipelagoOptions {
       neighbourhood: 5.0,
@@ -533,7 +535,7 @@ fn applies_avoidance_for_two_agents() {
     agent
   });
 
-  let mut agent_id_to_agent_node = HashMap::new();
+  let mut agent_id_to_agent_node = HashMap::default();
   agent_id_to_agent_node.insert(
     agent_1,
     (
@@ -553,7 +555,7 @@ fn applies_avoidance_for_two_agents() {
     &mut agents,
     &agent_id_to_agent_node,
     /* characters= */ &DenseSlotMap::with_key(),
-    /* character_id_to_nav_mesh_point= */ &HashMap::new(),
+    /* character_id_to_nav_mesh_point= */ &HashMap::default(),
     &nav_data,
     &ArchipelagoOptions {
       neighbourhood: 15.0,
@@ -623,7 +625,7 @@ fn agent_avoids_character() {
     radius: 1.0,
   });
 
-  let mut agent_id_to_agent_node = HashMap::new();
+  let mut agent_id_to_agent_node = HashMap::default();
   agent_id_to_agent_node.insert(
     agent,
     (
@@ -631,7 +633,7 @@ fn agent_avoids_character() {
       NodeRef { island_id, polygon_index: 0 },
     ),
   );
-  let mut character_id_to_nav_mesh_point = HashMap::new();
+  let mut character_id_to_nav_mesh_point = HashMap::default();
   character_id_to_nav_mesh_point
     .insert(character, characters.get(character).unwrap().position);
 
@@ -699,7 +701,7 @@ fn agent_speeds_up_to_avoid_character() {
     agent
   });
 
-  let mut agent_id_to_agent_node = HashMap::new();
+  let mut agent_id_to_agent_node = HashMap::default();
   agent_id_to_agent_node.insert(
     agent,
     (
@@ -712,7 +714,7 @@ fn agent_speeds_up_to_avoid_character() {
     &mut agents,
     &agent_id_to_agent_node,
     &DenseSlotMap::with_key(),
-    &HashMap::new(),
+    &HashMap::default(),
     &nav_data,
     &ArchipelagoOptions {
       neighbourhood: 15.0,
@@ -734,7 +736,7 @@ fn agent_speeds_up_to_avoid_character() {
     velocity: Vec2::new(0.0, -1.0),
     radius: 0.5,
   });
-  let mut character_id_to_nav_mesh_point = HashMap::new();
+  let mut character_id_to_nav_mesh_point = HashMap::default();
   character_id_to_nav_mesh_point
     .insert(character, characters.get(character).unwrap().position.extend(0.0));
 

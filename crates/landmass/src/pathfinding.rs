@@ -1,7 +1,5 @@
-use std::{
-  borrow::Cow,
-  collections::{HashMap, HashSet},
-};
+use crate::fixed_hash::HashSet;
+use std::borrow::Cow;
 
 use glam::Vec3;
 
@@ -32,7 +30,7 @@ struct ArchipelagoPathProblem<'a, CS: CoordinateSystem> {
   /// since it is constant for the whole problem.
   cheapest_type_index_cost: f32,
   /// Replacement costs for the `nav_data.type_index_to_cost`.
-  override_type_index_to_cost: &'a HashMap<usize, f32>,
+  override_type_index_to_cost: &'a std::collections::HashMap<usize, f32>,
   /// The set of permitted animation links for the agent.
   permitted_animation_links: PermittedAnimationLinks,
 }
@@ -145,7 +143,7 @@ impl<CS: CoordinateSystem> AStarProblem for ArchipelagoPathProblem<'_, CS> {
       .nav_data
       .node_to_off_mesh_link_ids
       .get(&node_ref)
-      .map_or(Cow::Owned(HashSet::new()), Cow::Borrowed);
+      .map_or(Cow::Owned(HashSet::default()), Cow::Borrowed);
 
     let current_node_cost = self.type_index_to_cost(polygon.type_index);
 
@@ -280,7 +278,7 @@ pub(crate) fn find_path<CS: CoordinateSystem>(
   start_point: Vec3,
   end_node: NodeRef,
   end_point: Vec3,
-  override_type_index_to_cost: &HashMap<usize, f32>,
+  override_type_index_to_cost: &std::collections::HashMap<usize, f32>,
   permitted_animation_links: PermittedAnimationLinks,
 ) -> PathResult {
   if !nav_data.are_nodes_connected(

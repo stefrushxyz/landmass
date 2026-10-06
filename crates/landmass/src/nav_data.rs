@@ -1,5 +1,6 @@
+use crate::fixed_hash::{HashMap, HashSet};
 use std::{
-  collections::{HashMap, HashSet, VecDeque},
+  collections::VecDeque,
   mem::swap,
   ops::{Deref, DerefMut},
   sync::Mutex,
@@ -146,19 +147,19 @@ impl<CS: CoordinateSystem> NavigationData<CS> {
     Self {
       islands: DenseSlotMap::with_key(),
       animation_links: DenseSlotMap::with_key(),
-      type_index_to_cost: HashMap::new(),
+      type_index_to_cost: HashMap::default(),
       // The navigation data is empty, so there's nothing to update (so not
       // dirty).
       dirty: false,
-      region_id_to_number: HashMap::new(),
+      region_id_to_number: HashMap::default(),
       region_connections: Mutex::new(DisjointSet::new()),
       region_number_to_possible_links: HashMap::default(),
       off_mesh_links: SlotMap::with_key(),
-      node_to_off_mesh_link_ids: HashMap::new(),
-      modified_nodes: HashMap::new(),
-      deleted_islands: HashSet::new(),
-      new_animation_links: HashSet::new(),
-      deleted_animation_links: HashSet::new(),
+      node_to_off_mesh_link_ids: HashMap::default(),
+      modified_nodes: HashMap::default(),
+      deleted_islands: HashSet::default(),
+      new_animation_links: HashSet::default(),
+      deleted_animation_links: HashSet::default(),
     }
   }
 
@@ -328,7 +329,7 @@ impl<CS: CoordinateSystem> NavigationData<CS> {
     edge_link_distance: f32,
     animation_link_distance: f32,
   ) -> (HashSet<OffMeshLinkId>, HashSet<IslandId>, HashSet<NodeRef>) {
-    let mut dirty_islands = HashSet::new();
+    let mut dirty_islands = HashSet::default();
     for (island_id, island) in self.islands.iter_mut() {
       if island.dirty {
         island.dirty = false;
@@ -342,9 +343,9 @@ impl<CS: CoordinateSystem> NavigationData<CS> {
       .copied()
       .collect::<HashSet<_>>();
 
-    let mut dropped_links = HashSet::new();
-    let mut changed_animation_links = HashSet::new();
-    let mut modified_node_refs_to_update = HashSet::new();
+    let mut dropped_links = HashSet::default();
+    let mut changed_animation_links = HashSet::default();
+    let mut modified_node_refs_to_update = HashSet::default();
     if !self.deleted_islands.is_empty()
       || !dirty_islands.is_empty()
       || !self.deleted_animation_links.is_empty()
@@ -1055,7 +1056,7 @@ impl<CS: CoordinateSystem> NavigationData<CS> {
 
     // Otherwise, we may need to use some possible links to get to the correct
     // region. Use a BFS to see if we can find the region.
-    let mut seen_regions = HashSet::new();
+    let mut seen_regions = HashSet::default();
     let mut region_queue = VecDeque::new();
     seen_regions.insert(region_number_1);
     region_queue.push_back(region_number_1);
@@ -1161,7 +1162,7 @@ impl<CS: CoordinateSystem> NavigationData<CS> {
     animation_link_distance: f32,
   ) -> (HashSet<OffMeshLinkId>, HashSet<IslandId>) {
     if !self.dirty {
-      return (HashSet::new(), HashSet::new());
+      return (HashSet::default(), HashSet::default());
     }
     self.dirty = false;
 

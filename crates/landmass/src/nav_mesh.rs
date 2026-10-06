@@ -1,9 +1,5 @@
-use std::{
-  cmp::Ordering,
-  collections::{HashMap, HashSet},
-  marker::PhantomData,
-  ops::Range,
-};
+use crate::fixed_hash::{HashMap, HashSet};
+use std::{cmp::Ordering, marker::PhantomData, ops::Range};
 
 use disjoint::DisjointSet;
 use glam::{Vec3, swizzles::Vec3Swizzles};
@@ -232,7 +228,7 @@ impl<CS: CoordinateSystem> NavigationMesh<CS> {
         edge_2: usize,
       },
     }
-    let mut connectivity_set = HashMap::new();
+    let mut connectivity_set = HashMap::default();
 
     for (polygon_index, polygon) in self.polygons.iter_mut().enumerate() {
       if polygon.len() < 3 {
@@ -320,8 +316,8 @@ impl<CS: CoordinateSystem> NavigationMesh<CS> {
       }
     }
 
-    let mut region_to_normalized_region = HashMap::new();
-    let mut used_type_indices = HashSet::new();
+    let mut region_to_normalized_region = HashMap::default();
+    let mut used_type_indices = HashSet::default();
 
     let mut polygons = self
       .polygons

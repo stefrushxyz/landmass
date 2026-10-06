@@ -1,8 +1,5 @@
-use std::{
-  cmp::Reverse,
-  collections::{BinaryHeap, HashMap},
-  hash::Hash,
-};
+use crate::fixed_hash::HashMap;
+use std::{cmp::Reverse, collections::BinaryHeap, hash::Hash};
 
 /// A generic A* problem.
 pub(crate) trait AStarProblem {
@@ -128,7 +125,7 @@ pub(crate) fn find_path<ProblemType: AStarProblem>(
 ) -> PathResult<ProblemType::ActionType> {
   let mut stats = PathStats { explored_nodes: 0 };
 
-  let mut best_estimates = HashMap::new();
+  let mut best_estimates = HashMap::default();
 
   let mut all_nodes = Vec::<Node<ProblemType>>::new();
   let mut open_nodes = BinaryHeap::new();
