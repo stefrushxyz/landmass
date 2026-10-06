@@ -281,6 +281,16 @@ impl Path {
       (point_1.xy() - point_0.xy()).perp_dot(point_2.xy() - point_0.xy())
     }
 
+    // Whether the apex is at one side of the funnel (like Detour's `dtVequal`).
+    // In that case the side's triangle has no area, so a point a hair outside
+    // the funnel due to float rounding (e.g. an end point lying on the portal)
+    // must not make us return the portal's other endpoint as a corner: from
+    // there we would return this endpoint again, forever.
+    fn same_point(point_0: Vec3, point_1: Vec3) -> bool {
+      const EPSILON: f32 = 1.0 / 16384.0;
+      point_0.xy().distance_squared(point_1.xy()) < EPSILON * EPSILON
+    }
+
     let mut portal_index = start_index.next(self);
     while portal_index <= end_index {
       let (portal_left, portal_right) = if portal_index == end_index {
@@ -322,7 +332,9 @@ impl Path {
       };
 
       if triangle_area_2(apex, current_right, portal_right) >= 0.0 {
-        if triangle_area_2(apex, current_left, portal_right) <= 0.0 {
+        if same_point(apex, current_right)
+          || triangle_area_2(apex, current_left, portal_right) <= 0.0
+        {
           right_index = portal_index;
           current_right = portal_right;
         } else {
@@ -331,7 +343,9 @@ impl Path {
       }
 
       if triangle_area_2(apex, current_left, portal_left) <= 0.0 {
-        if triangle_area_2(apex, current_right, portal_left) >= 0.0 {
+        if same_point(apex, current_left)
+          || triangle_area_2(apex, current_right, portal_left) >= 0.0
+        {
           left_index = portal_index;
           current_left = portal_left;
         } else {
@@ -365,6 +379,16 @@ impl Path {
         },
       ),
     }
+  }
+
+  /// How many portals (and off mesh links) the path crosses.
+  pub(crate) fn portal_count(&self) -> usize {
+    self
+      .island_segments
+      .iter()
+      .map(|segment| segment.portal_edge_index.len())
+      .sum::<usize>()
+      + self.off_mesh_link_segments.len()
   }
 
   pub(crate) fn last_index(&self) -> PathIndex {

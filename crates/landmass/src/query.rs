@@ -232,12 +232,22 @@ pub(crate) fn find_path<'a, CS: CoordinateSystem>(
     return Ok(path_points);
   }
 
+  // Each step of a straight path is at an end of a portal (or takes a link),
+  // so there are at most two steps for each portal, and the end. More than that
+  // and the funnel isn't getting anywhere (float rounding on a degenerate
+  // portal): rather than loop for ever, filling memory, go straight to the end.
+  let most_steps = 2 * path.portal_count() + 2;
+
   // Keep looping until we reach the end index. If it's the last index, but the
   // previous step was an animation link, run once more to get the waypoint to
   // the end point.
   while current_index != last_index
     || matches!(path_points.last().unwrap(), PathStep::AnimationLink { .. })
   {
+    if path_points.len() > most_steps {
+      path_points.push(PathStep::Waypoint(end_point.point()));
+      break;
+    }
     let next_step;
     (current_index, next_step) = path.find_next_point_in_straight_path(
       &archipelago.nav_data,

@@ -588,3 +588,69 @@ fn one_animation_link_path() {
     )
   );
 }
+
+#[test]
+fn finds_path_ending_on_the_last_portal() {
+  // The path goes from polygon 0 through 2 into 1, and ends on the edge
+  // between 2 and 1 (to within float rounding). The funnel's apex reaches `l`,
+  // a corner of both portals, and from either end of the last portal the end
+  // point appears a hair outside the funnel. These numbers come from a real
+  // navigation mesh, where the straight path alternated between the last
+  // portal's endpoints forever, growing until memory ran out.
+  let mut archipelago =
+    Archipelago::<XY>::new(ArchipelagoOptions::from_agent_radius(0.5));
+  let l = Vec2::new(-3.7333336, 22.66667);
+  let c = Vec2::new(-2.133335, 22.66667);
+  let r = Vec2::new(-8.933334, 23.600002);
+  let nav_mesh = Arc::new(
+    NavigationMesh {
+      vertices: vec![
+        Vec2::new(-3.7333336, 20.0),
+        Vec2::new(-2.133335, 20.0),
+        c,
+        l,
+        Vec2::new(-2.133335, 26.0),
+        Vec2::new(-8.933334, 26.0),
+        r,
+        Vec2::new(-8.933334, 20.0),
+      ],
+      // (The last polygon comes before the middle one, as in the mesh this came from: so the end,
+      // on the edge between them, is sampled in the last.)
+      polygons: vec![vec![0, 1, 2, 3], vec![6, 7, 3], vec![3, 2, 4, 5, 6]],
+      polygon_type_indices: vec![0, 0, 0],
+      height_mesh: None,
+    }
+    .validate()
+    .expect("nav mesh is valid"),
+  );
+  archipelago.add_island(Island::new(Transform::default(), nav_mesh));
+  archipelago.update(1.0);
+
+  let start = Vec2::new(-3.4666672, 22.000004);
+  let end = Vec2::new(-4.912285, 22.878277);
+  let start_point =
+    archipelago.sample_point(start, &1e-3).expect("on the mesh");
+  let end_point = archipelago.sample_point(end, &1e-3).expect("on the mesh");
+  assert_eq!(
+    end_point.node_ref.polygon_index, 1,
+    "the end is sampled in the last polygon"
+  );
+  let path = find_path(
+    &archipelago,
+    &start_point,
+    &end_point,
+    &HashMap::new(),
+    PermittedAnimationLinks::All,
+  )
+  .expect("there's a way");
+  let points: Vec<Vec2> = path
+    .iter()
+    .map(|step| match step {
+      PathStep::Waypoint(point) => *point,
+      PathStep::AnimationLink { .. } => panic!("there are no links"),
+    })
+    .collect();
+  assert_eq!(points.first(), Some(&start));
+  assert!(points.last().unwrap().distance(end) < 1e-3, "{points:?}");
+  assert!(points.len() <= 4, "{points:?}");
+}
